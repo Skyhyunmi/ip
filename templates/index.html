@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if session['admin'] %}
+<p>관리자라고 뭔가 있는줄 알았지?</p>
+<p>그저 과제 뿐</p>
+<a href="/priv">Private</a><br>
+<a href="/admin">Admin</a><br>
+{% endif %}
+
+{% if session['logged_in'] %}
+	<a href="/logout">Logout</a> <br> <br>
+
+	<p>잔액 : {{amount}}원</p>
+
+	<form action="/deposit" method="POST">
+		<input type="number" name="deposit" placeholder="입금액 입력">
+	  <input type="submit" value="입금">
+	</form>
+
+	<form action="/transaction" method="POST">
+		<input type="number" name="amount" placeholder="금액 입력">
+		<input type="text" name="sendto" placeholder="받는 사람">
+	  <input type="submit" value="이체">
+	</form>
+
+	<form action="/" method="POST">
+	  <input type="text" name="to" placeholder="to" required="required">
+		<input type="text" name="string" placeholder="전송할 메세지" required="required" value={{string}}>
+	  <input type="submit" value="메세지 전송">
+	</form>
+
+	{% if data %}
+	<p>{{data}}</p>
+	{% endif %}
+
+{% else %}
+<p>Login Page</p>
+
+<a href="/login">Login</a><br>
+<a href="/register">Register</a>
+{% endif %}
+{% endblock %}

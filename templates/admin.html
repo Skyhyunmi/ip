@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if session['admin'] %}
+
+{% for item in data%}
+<p>{{item.username}}님의 잔액 : {{item.deposit}}원</p>
+{% endfor %}
+<a href="/back">Back</a> <br> <br>
+{% endif %}
+{% endblock %}

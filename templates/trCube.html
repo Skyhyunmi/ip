@@ -1,0 +1,55 @@
+<html>
+
+<head>
+<title>WebGLHelloAPI</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="{{url_for('static',filename='trCube.js')}}">
+</script>
+
+
+</head>
+
+<body onload="main()">
+    <canvas id="helloapicanvas" style="border: none;" width="400" height="400"></canvas>
+	<br>
+	<button onclick="reset()">Reset</button>
+	<button onclick="transreset()">TranslationReset</button>
+	<button onclick="rotreset()">RotationReset</button>
+	<!--
+	<p id="frame">frame : 0</p>
+	-->
+	<p id="webTrAmount">TranslateAmount : 0.0100</p> 
+	<button onclick="TrAmountdec()">TranslateAmount - </button>
+	<button onclick="TrAmountinc()">TranslateAmount + </button>
+	<p id="webTrX">transX : 0.0000</p>
+	<p id="webTrY">transY : 0.0000</p>
+	<p id="webTrZ">transZ : 0.0000</p>
+	<button onclick="trXinc()">Translate X + </button>
+	<button onclick="trYinc()">Translate Y + </button>
+	<button onclick="trZinc()">Translate Z + </button> <br>
+	<button onclick="trXdec()">Translate X - </button>
+	<button onclick="trYdec()">Translate Y - </button>
+	<button onclick="trZdec()">Translate Z - </button><br><br>
+	<p id="webRotAmount">RotationAmount : 0.0100</p>
+	<p id="rv">Current Rotate Speed : 0.0000</p>
+	<button onclick="RotAmountdec()">RotationAmount - </button>
+	<button onclick="RotAmountinc()">RotationAmount + </button><br><br>
+	<button onclick="animRotatedec()">Animation Rotate -</button>
+	<button onclick="animResume()">AnimResume</button>
+	<button onclick="animPause()">AnimPause</button>
+	<button onclick="animRotateinc()">Animation Rotate +</button>
+	<table border=1> 
+	<tr > 
+	<td id="matrix0"> 	<td id="matrix4">  	<td id="matrix8">  	<td id="matrix12"> 
+	<tr> 
+	<td id="matrix1"> 	<td id="matrix5">  	<td id="matrix9">  	<td id="matrix13"> 
+	<tr> 
+	<td id="matrix2"> 	<td id="matrix6">  	<td id="matrix10">  	<td id="matrix14"> 
+	<tr> 
+	<td id="matrix3"> 	<td id="matrix7">  	<td id="matrix11">  	<td id="matrix15"> 
+	</table>
+	
+</body>
+
+</html>

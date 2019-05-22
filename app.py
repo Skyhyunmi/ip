@@ -111,17 +111,18 @@ def home():
 		if request.method == 'POST':
 			string = request.form['string']
 			sendto = request.form['to']
+			mes = Board.query.filter_by(sendto=sendto).all()
 			sendfrom = session['logged_in']
 			if eq(sendto, sendfrom):
-				return render_template('index.html', data='보내는 이와 받는 이가 같음')
+				return render_template('index.html', data='보내는 이와 받는 이가 같음',messages=mes)
 			if sendto is not None:
 				new_post = Board(sendfrom=sendfrom, sendto=sendto, string=string)
 				db.session.add(new_post)
 				db.session.commit()
-				return render_template('index.html', data='전송 완료')
+				return render_template('index.html', data='전송 완료',messages=mes)
 			else:
-				return render_template('index.html', data='받는이 없음', string=string)
-		return render_template('index.html')
+				return render_template('index.html', data='받는이 없음', string=string,messages=mes)
+		return render_template('index.html',messages=mes)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -132,6 +133,7 @@ def login():
 		name = request.form['username']
 		passw = request.form['password']
 		cur = User.query.filter_by(username=name).first()
+		mes = Board.query.filter_by(sendto=name).all()
 		try:
 			if check_password_hash(cur.password, passw):
 				# session_key = redis_session().save_session(name)
@@ -139,11 +141,11 @@ def login():
 				if name == 'admin':
 					session['admin'] = True
 				# return redirect(url_for('home'))
-				return render_template('index.html',amount=cur.deposit)
+				return render_template('index.html',amount=cur.deposit,messages=mes)
 			else:
-				return render_template('login.html', data='ID or PW is invalid')
+				return render_template('login.html', data='ID or PW is invalid',messages=mes)
 		except:
-			return render_template('login.html', data='ID or PW is invalid')
+			return render_template('login.html', data='ID or PW is invalid',messages=mes)
 
 @app.route('/register/', methods=['GET', 'POST'])
 ##### password를 만드는데 id로 같이 들어가게 만들어놨음.

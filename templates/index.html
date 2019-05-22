@@ -12,7 +12,7 @@
 	<a href="/logout">Logout</a> <br> <br>
 
 	<p>잔액 : {{amount}}원</p>
-
+	
 	<form action="/deposit" method="POST">
 		<input type="number" name="deposit" placeholder="입금액 입력">
 	  <input type="submit" value="입금">
@@ -33,7 +33,11 @@
 	{% if data %}
 	<p>{{data}}</p>
 	{% endif %}
-
+	
+	{% for item in messages%}
+	<p>from {{item.sendfrom}} to {{item.sendto}}</p>
+	<p>내용 : {{item.string}}</p>
+	{% endfor %}
 {% else %}
 <p>Login Page</p>
 

@@ -7,10 +7,35 @@
 {% if data %}
 <p>{{data}}</p>
 {% endif %}
-<form action="/login" method="POST">
+<script type="text/javascript" src="../static/jquery.min.js"></script>
+<script type="text/javascript" src="../static/jsencrypt.min.js"></script>
+
+
+<script type="text/javascript">
+function doRSA(){
+  var pubkey = $('#pubkey').val();
+  var rsa = new JSEncrypt();
+  rsa.setPublicKey(pubkey);
+  var pw = $('#password').val();
+  var hpw = rsa.encrypt(pw);
+  console.log(hpw);
+  $('#password').val(hpw);
+  $('#login').submit();
+  return true;
+}
+</script>
+<!--
+<input type="hidden" name="pubkey" id="pubkey" value="{{pubkey}}">
+<input type="button" value="Login" onclick="doRSA()">
+-->
+
+
+
+<form id="login" action="/login" method="POST">
   <input type="username" name="username" placeholder="Username">
-  <input type="password" name="password" placeholder="Password">
+  <input type="password" id="password" name="password" placeholder="Password">
   <input type="submit" value="Login">
+  
 </form>
 
 {% endif %}

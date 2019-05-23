@@ -2,6 +2,11 @@ from flask import Flask, url_for, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from operator import eq
+from Crypto.PublicKey import RSA 
+from Crypto import Random
+from Crypto.Cipher import PKCS1_OAEP as PKCS
+from Crypto.Cipher import AES
+from base64 import b64decode
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'this is secret'
@@ -49,14 +54,16 @@ def back():
 	if session.get('admin'):
 		cur = User.query.filter_by(username='admin').first()
 		return render_template('index.html',amount = cur.deposit)
-
+	else:
+		return render_template('index.html')
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
 	if session.get('admin'):
 		data = User.query.order_by(User.username.asc()).all()
 		print(data)
 		return render_template('admin.html',data = data)
-
+	else:
+		return render_template('index.html')
 @app.route('/deposit', methods=['GET', 'POST'])
 def deposit():
 	if not session.get('logged_in'):
@@ -69,6 +76,7 @@ def deposit():
 				return render_template('index.html', data='다시 입력',amount=cur.deposit)
 			username = session['logged_in']
 			cur = User.query.filter_by(username=username).first()
+			
 			cur.deposit += int(deposit)
 			db.session.commit()
 			return render_template('index.html',data='입금 완료',amount=cur.deposit)
@@ -108,20 +116,21 @@ def home():
 	if not session.get('logged_in'):
 		return render_template('index.html')
 	else:
+		sendfrom = session['logged_in']
+		mes = Board.query.filter_by(sendto=sendfrom).all()
 		if request.method == 'POST':
 			string = request.form['string']
-			sendto = request.form['to']
-			mes = Board.query.filter_by(sendto=sendto).all()
-			sendfrom = session['logged_in']
+			sendto = request.form['to']	
+			cur = User.query.filter_by(username=sendto).first()
 			if eq(sendto, sendfrom):
-				return render_template('index.html', data='보내는 이와 받는 이가 같음',messages=mes)
+				return render_template('index.html', data='보내는 이와 받는 이가 같음',messages=mes,amount=cur.deposit)
 			if sendto is not None:
 				new_post = Board(sendfrom=sendfrom, sendto=sendto, string=string)
 				db.session.add(new_post)
 				db.session.commit()
-				return render_template('index.html', data='전송 완료',messages=mes)
+				return render_template('index.html', data='전송 완료',messages=mes,amount=cur.deposit)
 			else:
-				return render_template('index.html', data='받는이 없음', string=string,messages=mes)
+				return render_template('index.html', data='받는이 없음', string=string,messages=mes,amount=cur.deposit)
 		return render_template('index.html',messages=mes)
 
 
@@ -133,9 +142,9 @@ def login():
 		name = request.form['username']
 		passw = request.form['password']
 		cur = User.query.filter_by(username=name).first()
-		mes = Board.query.filter_by(sendto=name).all()
 		try:
 			if check_password_hash(cur.password, passw):
+				mes = Board.query.filter_by(sendto=name).all()
 				# session_key = redis_session().save_session(name)
 				session['logged_in'] = name
 				if name == 'admin':
@@ -143,9 +152,9 @@ def login():
 				# return redirect(url_for('home'))
 				return render_template('index.html',amount=cur.deposit,messages=mes)
 			else:
-				return render_template('login.html', data='ID or PW is invalid',messages=mes)
+				return render_template('login.html', data='ID or PW is invalid')
 		except:
-			return render_template('login.html', data='ID or PW is invalid',messages=mes)
+			return render_template('login.html', data='ID or PW is invalid')
 
 @app.route('/register/', methods=['GET', 'POST'])
 ##### password를 만드는데 id로 같이 들어가게 만들어놨음.
@@ -172,8 +181,36 @@ def logout():
 	session['admin'] = False
 	return redirect(url_for('home'))
 
+def makersa():
+	random_generator = Random.new().read 
+	keypair = RSA.generate(1024, random_generator) 
+	pri = open("prkey.pem","wb+")
+	pri.write(keypair.export_key())
+	pri.close()
+
+	pubkey = keypair.publickey()
+	pub = open("pubkey.pem","wb+")
+	pub.write(pubkey.export_key())
+	pub.close()
+
+def encrypt(msg):
+	with open('pubkey.pem', 'rb') as f:
+		key = RSA.importKey(f.read())
+	cipher = PKCS.new(key)
+	encrypted = cipher.encrypt(msg)
+	return encrypted
+
+def decryptRSA(msg):
+	h = RSA.importKey(open('prkey.pem','rb').read())
+	verify = PKCS.new(h)
+	data = verify.decrypt(msg)
+	print(data)
+	return data
+	
+
 if __name__ == '__main__':
-	app.debug = False
+	app.debug = True
 	db.create_all()
 	context = ('key.crt', 'key.key')
-	app.run(host='localhost', port=12345, ssl_context=context)
+	# app.run(host='localhost', port=12345, ssl_context=context)
+	app.run(host='localhost', port=12345)

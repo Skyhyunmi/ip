@@ -35,9 +35,10 @@
 	{% endif %}
 	
 	{% for item in messages%}
-	<p>from {{item.sendfrom}} to {{item.sendto}}</p>
+	<p>from {{item.sendfrom}}</p>
 	<p>내용 : {{item.string}}</p>
 	{% endfor %}
+
 {% else %}
 <p>Login Page</p>
 
